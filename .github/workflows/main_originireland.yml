@@ -21,18 +21,15 @@ jobs:
         with:
           java-version: '17'
 
-      - name: Navigate to Subdirectory
-        run: cd OriginWeb
-
       - name: Build with Maven
         run: mvn clean install
-        working-directory: OriginWeb # add the working directory
+        working-directory: OriginWeb # Set the working directory
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: java-app
-          path: 'OriginWeb/target/*.jar' # update the path to the jar file
+          path: 'OriginWeb/target/*.jar' # Update the path to the jar file
 
   deploy:
     runs-on: ubuntu-latest
@@ -40,8 +37,13 @@ jobs:
     environment:
       name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    
     steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }} # Azure credentials
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
