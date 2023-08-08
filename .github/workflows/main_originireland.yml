@@ -21,22 +21,26 @@ jobs:
         with:
           java-version: '17'
 
+      - name: Navigate to Subdirectory
+        run: cd OriginWeb
+
       - name: Build with Maven
         run: mvn clean install
+        working-directory: OriginWeb # add the working directory
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: 'OriginWeb/target/*.jar' # update the path to the jar file
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
@@ -48,6 +52,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'OriginIreland'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A788855965F54756978E4497FBA64998 }}
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_1df5e278797a4a24a0e684bdc7c5e5fc }}
           package: '*.jar'
